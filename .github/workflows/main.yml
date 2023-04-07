@@ -1,0 +1,29 @@
+name: Schedule_fetch_latest
+on: 
+  schedule: 
+     - cron: '0 0 * * *'    # 每天 0:00 执行
+env:
+  REPO_NAME: 'bhj128128/Telegraph-Image'  # 改为您希望同步的仓库名称
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch from upstream
+        id: fetch
+        uses: wei/cron-sync@v1     # Action名字叫：wei/cron-sync, 可以去marketplace里搜
+        with:
+          dest: upstream
+      - name: Merge
+        id: merge
+        uses: wei/git-auto-merge@v1  # Action名字叫: wei/git-auto-merge
+        with:
+          commit-message: auto merge
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push
+        uses: ad-m/github-push-action@master  # Action名字叫：ad-m/github-push-action
+        with:
+          github_ref: "refs/heads/main"
+          directory: .
+          force: true
+        env:
+          PERSONAL_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
